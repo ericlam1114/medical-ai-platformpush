@@ -3,29 +3,29 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+
   try {
-    const res = NextResponse.next()
-    const supabase = createMiddlewareClient({ req, res })
+    // Refresh session if it exists
+    await supabase.auth.getSession()
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
-
-    // Only redirect for protected routes
+    // Handle protected routes
     if (req.nextUrl.pathname.startsWith('/dashboard')) {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
       if (!session) {
-        return NextResponse.redirect(new URL('/login', req.url))
+        const redirectUrl = new URL('/login', req.url)
+        return NextResponse.redirect(redirectUrl)
       }
     }
 
     return res
   } catch (error) {
     console.error('Middleware error:', error)
-    // On error, allow the request to continue but ensure protected routes are still secure
-    if (req.nextUrl.pathname.startsWith('/dashboard')) {
-      return NextResponse.redirect(new URL('/login', req.url))
-    }
-    return NextResponse.next()
+    return res
   }
 }
 
@@ -33,11 +33,11 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

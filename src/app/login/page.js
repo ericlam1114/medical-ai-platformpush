@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -16,35 +16,50 @@ export default function Login() {
   const [resendSuccess, setResendSuccess] = useState(false)
   const router = useRouter()
 
+  // Check for existing session on mount
+  useEffect(() => {
+    let mounted = true
+
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) throw error
+        
+        if (session && mounted) {
+          console.log('Existing session found, redirecting to dashboard...')
+          window.location.href = '/dashboard'
+        }
+      } catch (error) {
+        console.error('Session check error:', error)
+      }
+    }
+
+    checkSession()
+    
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
       setLoading(true)
       setError(null)
-      console.log('Starting login attempt for:', email)
-  
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      
+      console.log('Attempting to sign in with email:', email)
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
   
-      console.log('Sign in response:', { data, error: signInError })
-  
-      if (signInError) {
-        throw signInError
-      }
-  
-      // Get session and verify it exists
-      const { data: { session } } = await supabase.auth.getSession()
-      console.log('Session after login:', session)
-  
-      if (session) {
-        // Force a hard navigation instead of client-side routing
-        window.location.href = '/dashboard'
-      } else {
-        throw new Error('No session after successful login')
-      }
-  
+      if (error) throw error
+      
+      console.log('Sign in successful:', data)
+      router.refresh()
+      router.push('/dashboard')
+      
     } catch (error) {
       console.error('Login error:', error)
       setError(error.message)

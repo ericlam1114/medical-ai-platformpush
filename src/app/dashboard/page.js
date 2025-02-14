@@ -1,45 +1,49 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { LogOut, User, Settings, FileText } from 'lucide-react'
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { LogOut, User, Settings, FileText } from "lucide-react";
 
 export default function Dashboard() {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession()
-        
-        if (error) throw error
-        
-        if (!session) {
-          window.location.href = '/login'
-          return
-        }
-
-        setUser(session.user)
+        const { data: { session } } = await supabase.auth.getSession()
+        setUser(session?.user || null)
       } catch (error) {
         console.error('Error checking auth status:', error)
-        window.location.href = '/login'
       } finally {
         setLoading(false)
       }
     }
 
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null)
+      if (!session) {
+        router.refresh()
+        router.push('/login')
+      }
+    })
+
     checkUser()
-  }, [])
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [router])
 
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut()
-      window.location.href = '/login'
+      router.refresh()
+      router.push('/login')
     } catch (error) {
-      console.error('Error signing out:', error)
+      console.error("Error signing out:", error)
     }
   }
 
@@ -48,11 +52,11 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-lg text-gray-600">Loading...</div>
       </div>
-    )
+    );
   }
 
   if (!user) {
-    return null
+    return null;
   }
 
   return (
@@ -99,7 +103,9 @@ export default function Dashboard() {
             {/* Start New Session Card */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 hover:border-[#0084C7]/20 transition-colors">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">New Session</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  New Session
+                </h3>
                 <FileText className="w-5 h-5 text-[#0084C7]" />
               </div>
               <p className="text-gray-600 text-sm mb-4">
@@ -113,7 +119,9 @@ export default function Dashboard() {
             {/* Previous Sessions Card */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 hover:border-[#0084C7]/20 transition-colors">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Previous Sessions</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Previous Sessions
+                </h3>
                 <FileText className="w-5 h-5 text-[#0084C7]" />
               </div>
               <p className="text-gray-600 text-sm mb-4">
@@ -127,7 +135,9 @@ export default function Dashboard() {
             {/* Settings Card */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 hover:border-[#0084C7]/20 transition-colors">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Settings</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Settings
+                </h3>
                 <Settings className="w-5 h-5 text-[#0084C7]" />
               </div>
               <p className="text-gray-600 text-sm mb-4">
@@ -142,7 +152,9 @@ export default function Dashboard() {
 
         {/* Recent Activity Section */}
         <div className="px-4 sm:px-0">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Recent Activity
+          </h3>
           <div className="bg-white rounded-lg border border-gray-200">
             {/* Add your recent activity content here */}
             <div className="p-6 text-center text-gray-500">
@@ -152,5 +164,5 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }
