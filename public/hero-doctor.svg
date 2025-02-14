@@ -3,75 +3,57 @@
     <!-- Background Gradient Circle -->
     <circle cx="343" cy="344" r="240" fill="url(#blue-gradient)" fill-opacity="0.1"/>
     
-    <!-- Connecting Flow Lines - Moved to back -->
+    <!-- Background Connecting Lines -->
     <g stroke="#0084C7" stroke-width="2">
-      <!-- Consultation to AI -->
-      <path d="M263 344 L323 344">
-        <animate attributeName="stroke-dashoffset" values="20;0" dur="1s" repeatCount="indefinite"/>
-        <animate attributeName="stroke-dasharray" values="5,5" dur="1s" repeatCount="indefinite"/>
-      </path>
-      
-      <!-- AI to SOAP Notes -->
-      <path d="M383 324 C383 244 283 184 283 184">
-        <animate attributeName="stroke-dashoffset" values="20;0" dur="1s" repeatCount="indefinite"/>
-        <animate attributeName="stroke-dasharray" values="5,5" dur="1s" repeatCount="indefinite"/>
-      </path>
-
-      <!-- AI to Clinical Support -->
-      <path d="M423 344 L483 344">
-        <animate attributeName="stroke-dashoffset" values="20;0" dur="1s" repeatCount="indefinite"/>
-        <animate attributeName="stroke-dasharray" values="5,5" dur="1s" repeatCount="indefinite"/>
-      </path>
-
-      <!-- AI to Lab Analysis -->
-      <path d="M383 364 C383 444 283 504 283 504">
-        <animate attributeName="stroke-dashoffset" values="0;20" dur="1s" repeatCount="indefinite"/>
-        <animate attributeName="stroke-dasharray" values="5,5" dur="1s" repeatCount="indefinite"/>
-      </path>
-    </g>
-
-    <!-- Central Doctor-Patient Consultation -->
-    <g transform="translate(143, 284)">
-      <!-- Consultation Box -->
-      <rect width="120" height="120" rx="8" fill="white" stroke="#0084C7" stroke-width="2"/>
-      <text x="60" y="50" text-anchor="middle" font-family="system-ui" font-size="14" fill="#0084C7">Active</text>
-      <text x="60" y="70" text-anchor="middle" font-family="system-ui" font-size="14" fill="#0084C7">Consultation</text>
-      
-      <!-- Audio Waveform Animation -->
-      <g transform="translate(20, 90)">
-        <rect x="0" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
-          <animate attributeName="height" values="15;5;15" dur="1s" repeatCount="indefinite"/>
-        </rect>
-        <rect x="8" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
-          <animate attributeName="height" values="5;15;5" dur="1s" repeatCount="indefinite"/>
-        </rect>
-        <rect x="16" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
-          <animate attributeName="height" values="15;5;15" dur="1s" repeatCount="indefinite"/>
-        </rect>
-        <rect x="24" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
-          <animate attributeName="height" values="5;15;5" dur="1s" repeatCount="indefinite"/>
-        </rect>
-        <rect x="32" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
-          <animate attributeName="height" values="15;5;15" dur="1s" repeatCount="indefinite"/>
-        </rect>
+      <!-- All connecting lines moved to background -->
+      <g opacity="0.6">
+        <!-- Straight lines -->
+        <path d="M263 344 L323 344">
+          <animate attributeName="stroke-dashoffset" values="20;0" dur="1s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="5,5" dur="1s" repeatCount="indefinite"/>
+        </path>
+        <path d="M423 344 L483 344">
+          <animate attributeName="stroke-dashoffset" values="20;0" dur="1s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="5,5" dur="1s" repeatCount="indefinite"/>
+        </path>
+        <!-- Curved paths explicitly in background -->
+        <path d="M383 324 C383 244 283 184 283 184" style="mix-blend-mode: multiply;">
+          <animate attributeName="stroke-dashoffset" values="20;0" dur="1s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="5,5" dur="1s" repeatCount="indefinite"/>
+        </path>
+        <path d="M383 364 C383 444 283 504 283 504" style="mix-blend-mode: multiply;">
+          <animate attributeName="stroke-dashoffset" values="0;20" dur="1s" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dasharray" values="5,5" dur="1s" repeatCount="indefinite"/>
+        </path>
       </g>
     </g>
 
-    <!-- AI Core Processing Node -->
-    <g transform="translate(323, 284)">
-      <circle cx="60" cy="60" r="40" fill="#0084C7" fill-opacity="0.1" stroke="#0084C7" stroke-width="2"/>
-      <text x="60" y="55" text-anchor="middle" font-family="system-ui" font-size="14" fill="#0084C7">AI</text>
-      <text x="60" y="75" text-anchor="middle" font-family="system-ui" font-size="14" fill="#0084C7">Core</text>
+    <!-- Data Flow Particles -->
+    <g>
+      <!-- Consultation to AI -->
+      <circle cx="293" cy="344" r="3" fill="#0084C7">
+        <animate attributeName="cx" values="263;323" dur="1s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite"/>
+      </circle>
       
-      <!-- Rotating Processing Indicator -->
-      <circle cx="60" cy="60" r="50" stroke="#0084C7" stroke-width="2" stroke-dasharray="30 30" fill="none">
-        <animateTransform
-          attributeName="transform"
-          type="rotate"
-          from="0 60 60"
-          to="360 60 60"
-          dur="3s"
-          repeatCount="indefinite"/>
+      <!-- AI to SOAP -->
+      <circle cx="333" cy="284" r="3" fill="#0084C7">
+        <animate attributeName="cx" values="383;283" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="324;184" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- AI to Clinical Support -->
+      <circle cx="453" cy="344" r="3" fill="#0084C7">
+        <animate attributeName="cx" values="423;483" dur="1s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite"/>
+      </circle>
+
+      <!-- AI to Lab Analysis -->
+      <circle cx="333" cy="404" r="3" fill="#0084C7">
+        <animate attributeName="cx" values="283;383" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="504;364" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
       </circle>
     </g>
 
@@ -149,32 +131,52 @@
       </g>
     </g>
 
-    <!-- Data Flow Particles -->
-    <g>
-      <!-- Consultation to AI -->
-      <circle cx="293" cy="344" r="3" fill="#0084C7">
-        <animate attributeName="cx" values="263;323" dur="1s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite"/>
-      </circle>
+    <!-- Central Doctor-Patient Consultation -->
+    <g transform="translate(143, 284)">
+      <!-- Consultation Box -->
+      <rect width="120" height="120" rx="8" fill="white" stroke="#0084C7" stroke-width="2"/>
+      <text x="60" y="50" text-anchor="middle" font-family="system-ui" font-size="14" fill="#0084C7">Active</text>
+      <text x="60" y="70" text-anchor="middle" font-family="system-ui" font-size="14" fill="#0084C7">Consultation</text>
       
-      <!-- AI to SOAP -->
-      <circle cx="333" cy="284" r="3" fill="#0084C7">
-        <animate attributeName="cx" values="383;283" dur="2s" repeatCount="indefinite"/>
-        <animate attributeName="cy" values="324;184" dur="2s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
-      </circle>
+      <!-- Audio Waveform Animation -->
+      <g transform="translate(20, 90)">
+        <rect x="0" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
+          <animate attributeName="height" values="15;5;15" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="8" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
+          <animate attributeName="height" values="5;15;5" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="16" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
+          <animate attributeName="height" values="15;5;15" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="24" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
+          <animate attributeName="height" values="5;15;5" dur="1s" repeatCount="indefinite"/>
+        </rect>
+        <rect x="32" y="0" width="4" height="15" fill="#0084C7" opacity="0.6">
+          <animate attributeName="height" values="15;5;15" dur="1s" repeatCount="indefinite"/>
+        </rect>
+      </g>
+    </g>
 
-      <!-- AI to Clinical Support -->
-      <circle cx="453" cy="344" r="3" fill="#0084C7">
-        <animate attributeName="cx" values="423;483" dur="1s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite"/>
-      </circle>
-
-      <!-- AI to Lab Analysis -->
-      <circle cx="333" cy="404" r="3" fill="#0084C7">
-        <animate attributeName="cx" values="283;383" dur="2s" repeatCount="indefinite"/>
-        <animate attributeName="cy" values="504;364" dur="2s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+    <!-- AI Core Processing Node (Moved completely to front) -->
+    <g transform="translate(323, 284)">
+      <!-- Solid white background circle to cover lines -->
+      <circle cx="60" cy="60" r="52" fill="white"/>
+      
+      <!-- AI Core Content -->
+      <circle cx="60" cy="60" r="40" fill="#0084C7" fill-opacity="0.1" stroke="#0084C7" stroke-width="2"/>
+      <text x="60" y="55" text-anchor="middle" font-family="system-ui" font-size="14" fill="#0084C7">AI</text>
+      <text x="60" y="75" text-anchor="middle" font-family="system-ui" font-size="14" fill="#0084C7">Core</text>
+      
+      <!-- Rotating Processing Indicator -->
+      <circle cx="60" cy="60" r="50" stroke="#0084C7" stroke-width="2" stroke-dasharray="30 30" fill="none">
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          from="0 60 60"
+          to="360 60 60"
+          dur="3s"
+          repeatCount="indefinite"/>
       </circle>
     </g>
   </g>

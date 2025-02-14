@@ -8,7 +8,7 @@ import { Mic, Download, Upload, Edit2, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
-import DashboardNav from '@/components/DashboardNav'
+import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
 export default function AiScribe() {
@@ -44,13 +44,32 @@ export default function AiScribe() {
   }, [router])
 
   // Speech recognition setup
+  // Speech recognition setup
   const [recognition, setRecognition] = useState(null)
-  const [audioChunks, setAudioChunks] = useState([])
   const [mediaRecorder, setMediaRecorder] = useState(null)
+  const [micPermission, setMicPermission] = useState('prompt') // 'prompt', 'granted', 'denied'
 
   useEffect(() => {
-    // Initialize Web Speech API
-    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
+    // Check for browser support
+    if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+      console.error('Media devices not supported')
+      return
+    }
+
+    // Check microphone permission status
+    navigator.permissions.query({ name: 'microphone' })
+      .then(permissionStatus => {
+        setMicPermission(permissionStatus.state)
+        
+        // Listen for permission changes
+        permissionStatus.onchange = () => {
+          setMicPermission(permissionStatus.state)
+        }
+      })
+      .catch(err => console.error('Error checking permission:', err))
+
+    // Initialize Web Speech API if available
+    if ('webkitSpeechRecognition' in window) {
       const recognition = new window.webkitSpeechRecognition()
       recognition.continuous = true
       recognition.interimResults = true
@@ -62,69 +81,88 @@ export default function AiScribe() {
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcriptText = event.results[i][0].transcript
           if (event.results[i].isFinal) {
-            finalTranscript += transcriptText
+            finalTranscript += ' ' + transcriptText
           } else {
             interimTranscript += transcriptText
           }
         }
 
-        setTranscript(finalTranscript)
+        setTranscript(finalTranscript.trim())
       }
 
       recognition.onerror = (event) => {
         console.error('Speech recognition error:', event.error)
+        if (event.error === 'not-allowed') {
+          setMicPermission('denied')
+        }
         setIsRecording(false)
       }
 
       setRecognition(recognition)
     }
-
-    // Initialize audio recording
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
-        const recorder = new MediaRecorder(stream)
-        const chunks = []
-
-        recorder.ondataavailable = (e) => {
-          if (e.data.size > 0) {
-            chunks.push(e.data)
-          }
-        }
-
-        recorder.onstop = () => {
-          setAudioChunks(chunks)
-        }
-
-        setMediaRecorder(recorder)
-      })
-      .catch(err => console.error('Error accessing microphone:', err))
-
-    return () => {
-      if (recognition) {
-        recognition.stop()
-      }
-      if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop()
-      }
-    }
   }, [transcript])
 
-  const startRecording = () => {
-    if (recognition && mediaRecorder) {
-      setIsRecording(true)
-      recognition.start()
-      mediaRecorder.start()
-    } else {
-      alert('Speech recognition is not supported in this browser')
+  const requestMicrophoneAccess = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      setMicPermission('granted')
+      
+      // Initialize media recorder with the stream
+      const recorder = new MediaRecorder(stream)
+      recorder.ondataavailable = handleAudioData
+      setMediaRecorder(recorder)
+      
+      return true
+    } catch (error) {
+      console.error('Error accessing microphone:', error)
+      setMicPermission('denied')
+      setError('Microphone access is required for recording. Please allow microphone access in your browser settings.')
+      return false
+    }
+  }
+
+  const handleAudioData = (event) => {
+    if (event.data.size > 0) {
+      // Here you could implement audio processing or storage
+      console.log('Audio data available:', event.data)
+    }
+  }
+
+  const startRecording = async () => {
+    setError(null)
+
+    // Check if we already have permission
+    if (micPermission !== 'granted') {
+      const permitted = await requestMicrophoneAccess()
+      if (!permitted) return
+    }
+
+    // Start recording
+    try {
+      if (recognition && mediaRecorder) {
+        setIsRecording(true)
+        recognition.start()
+        mediaRecorder.start()
+      } else {
+        setError('Speech recognition is not supported in this browser. You can still type your notes manually.')
+      }
+    } catch (error) {
+      console.error('Error starting recording:', error)
+      setError('Failed to start recording. Please try again.')
+      setIsRecording(false)
     }
   }
 
   const stopRecording = () => {
-    if (recognition && mediaRecorder) {
-      setIsRecording(false)
-      recognition.stop()
-      mediaRecorder.stop()
+    try {
+      if (recognition && mediaRecorder) {
+        recognition.stop()
+        mediaRecorder.stop()
+      }
+    } catch (error) {
+      console.error('Error stopping recording:', error)
     }
+    setIsRecording(false)
   }
 
   const generateSoapNotes = async () => {
@@ -236,7 +274,7 @@ export default function AiScribe() {
   }
 
   return (<div>
-        <DashboardNav user={user} />
+        <Navbar />
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
@@ -366,8 +404,9 @@ export default function AiScribe() {
             </div>
           ))}
         </div>
-        <Footer />
-      </div></div>
+      </div>
+      </div>
+      <Footer />
     </div>
   )
 }
