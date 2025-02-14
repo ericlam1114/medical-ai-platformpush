@@ -8,7 +8,8 @@ import { Mic, Download, Upload, Edit2, Save, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
-import Navbar from '@/components/Navbar'
+import DashboardNav from '@/components/DashboardNav'
+import Footer from '@/components/Footer'
 
 export default function AiScribe() {
   const [user, setUser] = useState(null)
@@ -235,7 +236,7 @@ export default function AiScribe() {
   }
 
   return (<div>
-        <Navbar />
+        <DashboardNav user={user} />
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
@@ -365,6 +366,7 @@ export default function AiScribe() {
             </div>
           ))}
         </div>
+        <Footer />
       </div></div>
     </div>
   )
